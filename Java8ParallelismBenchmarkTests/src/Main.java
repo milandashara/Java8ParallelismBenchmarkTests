@@ -120,18 +120,17 @@ public class Main {
 		// End Scenario 1
 
 		// Start Scenario 2
-		Thread[] sortThreads = new Thread[10];
-		Thread[] reduceThreads = new Thread[10];
-		Thread[] filterThreads = new Thread[10];
+		Thread[] threads = new Thread[10];
 
 		// Open 10 thread for Seq 3 test
+
+		// 1. Seq Sort
 		for (int i = 1; i <= 10; i++) {
 			Integer[] integerArray = randomArrayList.get(i - 1);
 			Row row = XLSUtil.createRow(scenario2Sheet, i);
 			Integer[] arrayToSort = integerArray.clone();
-			List<Integer> arrayToReduce = Arrays.asList(integerArray.clone());
-			List<Integer> arrayToFilter = Arrays.asList(integerArray.clone());
-			sortThreads[i - 1] = new Thread(new Runnable() {
+
+			threads[i - 1] = new Thread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -146,7 +145,22 @@ public class Main {
 
 				}
 			});
-			reduceThreads[i - 1] = new Thread(new Runnable() {
+
+			threads[i - 1].start();
+
+		}
+
+		// wait for threads to finish
+		for (Thread thread : threads) {
+			thread.join();
+		}
+
+		// 2. Seq Reduce
+		for (int i = 1; i <= 10; i++) {
+			Integer[] integerArray = randomArrayList.get(i - 1);
+			Row row = scenario2Sheet.getRow(i);
+			List<Integer> arrayToReduce = Arrays.asList(integerArray.clone());
+			threads[i - 1] = new Thread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -170,7 +184,24 @@ public class Main {
 
 				}
 			});
-			filterThreads[i - 1] = new Thread(new Runnable() {
+
+			threads[i - 1].start();
+
+		}
+
+		// wait for threads to finish
+		for (Thread thread : threads) {
+			thread.join();
+		}
+
+		// 3. Seq Filter
+		for (int i = 1; i <= 10; i++) {
+			Integer[] integerArray = randomArrayList.get(i - 1);
+			Row row = scenario2Sheet.getRow(i);
+
+			List<Integer> arrayToFilter = Arrays.asList(integerArray.clone());
+
+			threads[i - 1] = new Thread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -194,38 +225,29 @@ public class Main {
 				}
 			});
 
-			sortThreads[i - 1].start();
-			reduceThreads[i - 1].start();
-			filterThreads[i - 1].start();
+			threads[i - 1].start();
+
 		}
 
 		// wait for threads to finish
-		for (Thread thread : sortThreads) {
-			thread.join();
-		}
-		for (Thread thread : reduceThreads) {
-			thread.join();
-		}
-		for (Thread thread : filterThreads) {
+		for (Thread thread : threads) {
 			thread.join();
 		}
 
 		// Open 10 thread for Parallel 3 test
+
+		// 4. Parallel Filter Test
 		for (int i = 1; i <= 10; i++) {
 			Integer[] integerArray = randomArrayList.get(i - 1);
 			Row row = scenario2Sheet.getRow(i);
 			Integer[] arrayToParallelSort = integerArray.clone();
-			List<Integer> arrayToParallelReduce = Arrays.asList(integerArray
-					.clone());
-			List<Integer> arrayToParallelFilter = Arrays.asList(integerArray
-					.clone());
 
-			sortThreads[i - 1] = new Thread(new Runnable() {
+			threads[i - 1] = new Thread(new Runnable() {
 
 				@Override
 				public void run() {
 
-					// 4. Parallel filter using java 8 Parallism
+					// 4. Parallel Sort using java 8 Parallism
 					long startTime = System.nanoTime();
 					Arrays.parallelSort(arrayToParallelSort);
 					long endTime = System.nanoTime();
@@ -235,7 +257,23 @@ public class Main {
 				}
 			});
 
-			reduceThreads[i - 1] = new Thread(new Runnable() {
+			threads[i - 1].start();
+
+		}
+
+		// wait for threads to finish
+		for (Thread thread : threads) {
+			thread.join();
+		}
+
+		// 5. Parallel Reduction Test
+		for (int i = 1; i <= 10; i++) {
+			Integer[] integerArray = randomArrayList.get(i - 1);
+			Row row = scenario2Sheet.getRow(i);
+			List<Integer> arrayToParallelReduce = Arrays.asList(integerArray
+					.clone());
+
+			threads[i - 1] = new Thread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -252,7 +290,23 @@ public class Main {
 				}
 			});
 
-			filterThreads[i - 1] = new Thread(new Runnable() {
+			threads[i - 1].start();
+
+		}
+
+		// wait for threads to finish
+		for (Thread thread : threads) {
+			thread.join();
+		}
+
+		// 6. Parallel Filter Test
+		for (int i = 1; i <= 10; i++) {
+			Integer[] integerArray = randomArrayList.get(i - 1);
+			Row row = scenario2Sheet.getRow(i);
+			List<Integer> arrayToParallelFilter = Arrays.asList(integerArray
+					.clone());
+
+			threads[i - 1] = new Thread(new Runnable() {
 
 				@Override
 				public void run() {
@@ -268,19 +322,12 @@ public class Main {
 				}
 			});
 
-			sortThreads[i - 1].start();
-			reduceThreads[i - 1].start();
-			filterThreads[i - 1].start();
+			threads[i - 1].start();
+
 		}
 
 		// wait for threads to finish
-		for (Thread thread : sortThreads) {
-			thread.join();
-		}
-		for (Thread thread : reduceThreads) {
-			thread.join();
-		}
-		for (Thread thread : filterThreads) {
+		for (Thread thread : threads) {
 			thread.join();
 		}
 
